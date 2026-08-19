@@ -14,7 +14,7 @@ import {
   Lock
 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://hanut-server.vercel.app/api';
 
 export function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
