@@ -321,17 +321,19 @@ export function App() {
               <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
                 <h2 className="font-black text-sm text-white flex items-center gap-2">
                   <Users className="w-4 h-4 text-amber-400" />
-                  <span>سجل ديون الزبناء والتذكيرات</span>
+                  <span>سجل جميع الزبناء والتذكيرات</span>
                 </h2>
                 <span className="text-xs font-mono text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full font-bold">
-                  {activeDebtors.length} زبون
+                  {customers.length} زبون مسجل
                 </span>
               </div>
 
               <div className="space-y-2.5 max-h-[320px] overflow-y-auto no-scrollbar pe-1">
-                {activeDebtors.length > 0 ? (
-                  activeDebtors.map((customer) => {
+                {customers.length > 0 ? (
+                  customers.map((customer) => {
+                    const hasDebt = (customer.total_owed || 0) > 0;
                     const isOverdue =
+                      hasDebt &&
                       new Date().getTime() - new Date(customer.last_activity).getTime() >
                       30 * 24 * 60 * 60 * 1000;
 
@@ -341,7 +343,9 @@ export function App() {
                         className={`p-3 rounded-2xl border flex items-center justify-between transition-all ${
                           isOverdue
                             ? 'bg-rose-500/5 border-rose-500/40'
-                            : 'bg-slate-900/80 border-slate-800'
+                            : hasDebt
+                            ? 'bg-slate-900/80 border-slate-800'
+                            : 'bg-emerald-500/5 border-emerald-500/20'
                         }`}
                       >
                         <div>
@@ -354,25 +358,39 @@ export function App() {
                                 متأخر ⚠️
                               </span>
                             )}
+                            {!hasDebt && (
+                              <span className="text-[9px] bg-emerald-500/20 text-emerald-400 font-bold px-1.5 py-0.2 rounded-full border border-emerald-500/30">
+                                سديد (0 MAD) ✨
+                              </span>
+                            )}
                           </div>
-                          <p className="text-[11px] font-mono text-rose-400 font-black mt-0.5">
-                            {customer.total_owed.toFixed(2)} MAD
-                          </p>
+                          {customer.phone && (
+                            <p className="text-[10px] font-mono text-slate-400 mt-0.5 dir-ltr">
+                              📱 {customer.phone}
+                            </p>
+                          )}
+                          {hasDebt && (
+                            <p className="text-[11px] font-mono text-rose-400 font-black mt-0.5">
+                              {customer.total_owed.toFixed(2)} MAD
+                            </p>
+                          )}
                         </div>
 
-                        <button
-                          onClick={() => handleSendWhatsAppReminder(customer)}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1 shadow-sm transition-all"
-                        >
-                          <MessageCircle className="w-3.5 h-3.5" />
-                          <span>تذكير WhatsApp 📲</span>
-                        </button>
+                        {hasDebt && (
+                          <button
+                            onClick={() => handleSendWhatsAppReminder(customer)}
+                            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1 shadow-sm transition-all"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
+                            <span>تذكير WhatsApp 📲</span>
+                          </button>
+                        )}
                       </div>
                     );
                   })
                 ) : (
                   <div className="py-12 text-center text-slate-400 text-xs">
-                    لا توجد ديون معلقة حالياً 🎉
+                    لا يوجد زبناء مسجلون حالياً
                   </div>
                 )}
               </div>
