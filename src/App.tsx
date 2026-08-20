@@ -59,6 +59,8 @@ export function App() {
   useEffect(() => {
     if (isAuthenticated) {
       fetchCloudData();
+      const interval = setInterval(fetchCloudData, 5000);
+      return () => clearInterval(interval);
     }
   }, [isAuthenticated]);
 
